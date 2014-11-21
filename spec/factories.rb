@@ -21,6 +21,11 @@ FactoryGirl.define do
     f.association :channel
   end
 
+  factory :category_follower do |f|
+    f.association :user
+    f.association :category
+  end
+
   factory :user do |f|
     f.name "Foo bar"
     f.password "123456"
@@ -134,6 +139,21 @@ FactoryGirl.define do
   factory :state do
     name "RJ"
     acronym "RJ"
+  end
+
+  factory :bank do
+    name "Foo"
+    code "000"
+  end
+
+  factory :bank_account do |f|
+    f.association :user, factory: :user
+    f.association :bank, factory: :bank
+    owner_name "Foo"
+    owner_document "000"
+    account_digit "1"
+    agency "1"
+    account "1"
   end
 
   factory :channel_post do |f|

@@ -18,7 +18,7 @@ class Project < ActiveRecord::Base
   delegate  :display_online_date, :display_status, :progress, :display_progress,
             :display_image, :display_expires_at, :remaining_text, :time_to_go,
             :display_pledged, :display_goal, :remaining_days, :progress_bar,
-            :status_flag, :state_warning_template, :display_traffic_sources, to: :decorator
+            :status_flag, :state_warning_template, to: :decorator
 
   belongs_to :user
   belongs_to :category
@@ -33,6 +33,14 @@ class Project < ActiveRecord::Base
   accepts_nested_attributes_for :channels
 
   catarse_auto_html_for field: :about, video_width: 600, video_height: 403
+
+  pg_search_scope :search_on_name,
+    against: [[:name, 'A'], [:permalink, 'C'], [:headline, 'B']],
+    associated_against: {
+      category: [:name_pt, :name_en]
+    },
+    using: {tsearch: {dictionary: "portuguese"}},
+    ignoring: :accents
 
   pg_search_scope :pg_search, against: [
       [:name, 'A'],
@@ -103,6 +111,18 @@ class Project < ActiveRecord::Base
     with_state('online').where("(projects.expires_at - current_date) <= ?", time)
   }
 
+  scope :of_current_week, -> {
+    where("
+      projects.online_date AT TIME ZONE '#{Time.zone.tzinfo.name}' >= (current_timestamp AT TIME ZONE '#{Time.zone.tzinfo.name}' - '7 days'::interval)
+    ")
+  }
+
+  scope :using_pagarme, -> (permalinks) {
+    where("projects.permalink in (:permalinks) OR
+           projects.online_date::date  AT TIME ZONE '#{Time.zone.tzinfo.name}' >= '2014-11-10'::date AT TIME ZONE '#{Time.zone.tzinfo.name}'",
+          { permalinks: permalinks })
+  }
+
   attr_accessor :accepted_terms
 
   validates_acceptance_of :accepted_terms, on: :create
@@ -123,7 +143,9 @@ class Project < ActiveRecord::Base
 
   def self.send_verify_moip_account_notification
     expiring_in_less_of('7 days').find_each do |project|
-      project.notify_owner(:verify_moip_account, { from_email: CatarseSettings[:email_payments]})
+      unless project.using_pagarme?
+        project.notify_owner(:verify_moip_account, { from_email: CatarseSettings[:email_payments]})
+      end
     end
   end
 
@@ -134,6 +156,20 @@ class Project < ActiveRecord::Base
   def self.order_by(sort_field)
     return self.all unless sort_field =~ /^\w+(\.\w+)?\s(desc|asc)$/i
     order(sort_field)
+  end
+
+  def self.enabled_to_use_pagarme
+    begin
+      permalinks = CatarseSettings[:projects_enabled_to_use_pagarme].split(',').map(&:strip)
+    rescue
+      permalinks = []
+    end
+
+    self.using_pagarme(permalinks)
+  end
+
+  def using_pagarme?
+    Project.enabled_to_use_pagarme.include?(self)
   end
 
   def subscribed_users
@@ -178,10 +214,6 @@ class Project < ActiveRecord::Base
 
   def in_time_to_wait?
     contributions.with_state('waiting_confirmation').present?
-  end
-
-  def pending_contributions_reached_the_goal?
-    pledged_and_waiting >= goal
   end
 
   def pledged_and_waiting

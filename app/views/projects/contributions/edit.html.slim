@@ -19,7 +19,7 @@
         h2= t('.subtitle')
       .clearfix
       .bootstrap-form
-        = semantic_form_for current_user, url: '#', html: { data: { update_info_path: project_contribution_path(project_id: @contribution.project.id, id: @contribution.id, format: :json) }, id: 'review_form', class: "form-horizontal #{('dont_align' if @contribution.credits)}", method: 'put' } do |form|
+        = semantic_form_for current_user, url: '#', html: { data: { update_info_path: project_contribution_path(project_id: @contribution.project.id, id: @contribution.id, format: :json) }, id: 'review_form', class: "form-horizontal", method: 'put' } do |form|
           = hidden_field_tag 'project_id', @contribution.project.id
           = hidden_field_tag 'contribution_id', @contribution.id
           = hidden_field_tag 'payment_method_url', nil
@@ -55,15 +55,11 @@
 
           .tab_container
             nav#payment_menu
-              - avaiable_payment_engines.each do |engine|
+              - avaiable_payment_engines.compact.each do |engine|
                 = link_to "##{engine.name}_payment", id: engine.name, class: 'selected enabled' , data: {target: "##{engine.name}_payment"} do
                   = t("projects.contributions.review.#{engine.name}")
           .tab_content_container
             - avaiable_payment_engines.each do |engine|
               div[id="#{engine.name}_payment" class="payments_type hide" data-path=engine.review_path(@contribution) ]
-                - if engine.name == 'Pagarme'
-                  .bootstrap-twitter
-                    .alert.alert-warning
-                      = t('.pagarme_warning_html', mailto: mail_to(CatarseSettings[:email_contact]))
                 .results
     .clearfix

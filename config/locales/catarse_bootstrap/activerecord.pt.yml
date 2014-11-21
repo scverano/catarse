@@ -19,6 +19,17 @@ pt:
         account_digit: 'Dígito'
       contribution:
         value: valor do apoio
+        payer_name: "Nome Completo"
+        payer_email: "Email"
+        country: "País"
+        address_street: "Rua"
+        address_number: "Número"
+        address_complement: "Complemento"
+        address_neighbourhood: "Bairro"
+        address_state: "Estado"
+        address_city: "Cidade"
+        address_zip_code: "CEP"
+        address_phone_number: "Telefone"
         reward: recompensa
         project: projeto
       reward:
@@ -132,7 +143,6 @@ pt:
     reward_description: Descrição da recompensa
     confirmed_at: Data da confirmação do pagamento
     contribution_value: Valor do apoio
-    reward_deliver_at: Estimativa de entrega
     service_fee: Taxa do Catarse
     user_name: Nome do apoiador
     user_email: Email perfil Catarse

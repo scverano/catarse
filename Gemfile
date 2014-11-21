@@ -1,14 +1,13 @@
 source 'https://rubygems.org'
 
-ruby '2.1.2'
+ruby '2.1.3'
 
-gem 'rails', '~> 4.1.1'
+gem 'rails', '~> 4.1.6'
 
 gem 'protected_attributes', '~> 1.0.5' # When upgrade to strong_parameters, remove this gem.
 gem 'rails-observers', '~> 0.1.2'
 
 gem 'sidekiq',  '~> 3.1.3'
-gem 'sinatra', require: false # required by sidekiq web interface mounted on /sidekiq
 
 # Turns every field on a editable one
 gem "best_in_place", :git => "git://github.com/bernat/best_in_place", ref: "ee95961e639022e6aa528704b8cb4789596ea61b"
@@ -26,16 +25,15 @@ gem 'chartkick'
 gem 'catarse_settings_db', '>= 0.1.0'
 
 # Notifications
-gem 'user_notifier'
+gem 'user_notifier', '~> 0.0.5'
 
 # Mixpanel for backend tracking
 gem 'mixpanel-ruby'
 
 # Payment engines
-gem 'catarse_paypal_express', '2.2.3'
+gem 'catarse_paypal_express', '2.2.4'
 gem 'catarse_moip', '~> 2.3.6'
-gem 'catarse_credits', '0.0.6'
-gem 'catarse_pagarme', '1.0.0'
+gem 'catarse_pagarme', '1.4.7'
 gem 'catarse_contribution_validator', github: 'catarse/catarse_contribution_validator'
 # gem 'catarse_wepay', '~> 0.0.1'
 
@@ -126,7 +124,10 @@ group :development do
 end
 
 group :test, :development do
-  gem 'rspec-rails', '~> 2.14.0'
+  gem 'rspec-rails', '~> 3.1'
+  gem 'rspec-mocks'
+  gem 'rspec-its'
+  gem 'rspec-collection_matchers'
   gem 'pry'
   gem 'jasmine-rails'
 end
@@ -138,7 +139,7 @@ group :test do
   gem 'database_cleaner'
   gem 'shoulda'
   gem 'factory_girl_rails'
-  gem 'capybara',   '~> 2.1.0'
+  gem 'capybara',   '~> 2.2.0'
   gem 'coveralls', require: false
   gem 'selenium-webdriver'
 end

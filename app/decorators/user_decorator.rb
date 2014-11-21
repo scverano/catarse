@@ -22,7 +22,7 @@ class UserDecorator < Draper::Decorator
   end
 
   def display_name
-    source.name || source.full_name || I18n.t('user.no_name')
+    source.name.presence || source.full_name.presence || I18n.t('user.no_name')
   end
 
   def display_image
@@ -45,6 +45,22 @@ class UserDecorator < Draper::Decorator
 
   def display_credits
     number_to_currency source.credits
+  end
+
+  def display_bank_account
+    if source.bank_account.present?
+      "#{source.bank_account.bank.code} - #{source.bank_account.bank.name} /
+      AG. #{source.bank_account.agency}-#{source.bank_account.agency_digit} /
+      CC. #{source.bank_account.account}-#{source.bank_account.account_digit}"
+    else
+      I18n.t('not_filled')
+    end
+  end
+
+  def display_bank_account_owner
+    if source.bank_account.present?
+      "#{source.bank_account.owner_name} / CPF: #{source.bank_account.owner_document}"
+    end
   end
 
   def display_total_of_contributions
