@@ -19,7 +19,7 @@
         h2= t('.subtitle')
       .clearfix
       .bootstrap-form
-        = semantic_form_for current_user, url: '#', html: { data: { update_info_path: project_contribution_path(project_id: @contribution.project.id, id: @contribution.id, format: :json) }, id: 'review_form', class: "form-horizontal #{('dont_align' if @contribution.credits)}", method: 'put' } do |form|
+        = semantic_form_for current_user, url: '#', html: { data: { update_info_path: project_contribution_path(project_id: @contribution.project.id, id: @contribution.id, format: :json) }, id: 'review_form', class: "form-horizontal", method: 'put' } do |form|
           = hidden_field_tag 'project_id', @contribution.project.id
           = hidden_field_tag 'contribution_id', @contribution.id
           = hidden_field_tag 'payment_method_url', nil
@@ -28,20 +28,21 @@
               = check_box_tag 'live_in_brazil', 'live', params[:locale] == 'pt'
               = label_tag 'live_in_brazil', t('.live_in_brazil'), class: 'inline'
             = form.input :full_name, required: true, as: :string
-            /= form.input :cpf, as: :string, input_html: {autocomplete: 'off'}
             = form.input :email, required: true, as: :string
             .clearfix
             fieldset.address_data
               .title
                 h2
+              = form.input :cpf, as: :string, input_html: {autocomplete: 'off', data: {fixed_mask: '999.999.999-99'}}, required: true
+              .clearfix
               = form.input :address_street, as: :string, required: true
               = form.input :address_number, as: :string, required: true
               = form.input :address_complement, required: false, as: :string
               = form.input :address_neighbourhood, as: :string, required: true
-              = form.input :address_zip_code, as: :string, input_html: {autocomplete: 'off', data: {mask: '99999-999'}}, required: true
+              = form.input :address_zip_code, as: :string, input_html: {autocomplete: 'off', data: {fixed_mask: '99999-999'}}, required: true
               = form.input :address_city, as: :string, required: true
               = form.input :address_state, as: :select, collection: State.array, required: true
-              = form.input :phone_number, as: :string, input_html: {autocomplete: 'off', data: {mask: '(99)9999-9999?9'}}, required: true
+              = form.input :phone_number, as: :string, input_html: {autocomplete: 'off', data: {fixed_mask: '(99)9999-99999'}}, required: true
           .submit
             fieldset.accept_terms
               = check_box_tag 'accept'
@@ -54,7 +55,7 @@
 
           .tab_container
             nav#payment_menu
-              - avaiable_payment_engines.each do |engine|
+              - avaiable_payment_engines.compact.each do |engine|
                 = link_to "##{engine.name}_payment", id: engine.name, class: 'selected enabled' , data: {target: "##{engine.name}_payment"} do
                   = t("projects.contributions.review.#{engine.name}")
           .tab_content_container

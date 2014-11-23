@@ -1,12 +1,45 @@
 pt:
   projects:
+    dashboard_project:
+      start: "Conte o que você tem a dizer para o mundo!"
+      start_subtitle: "Use esse espaço abaixo para contar sobre seu projeto e o porquê as pessoas deveriam se empolgar com ele e abraçar sua ideia"
+      video_url: "URL do vídeo"
+      video_url_hint: "Link do seu vídeo no Vimeo ou Youtube."
+      about: "Descrição do projeto"
+      about_hint_html: 'Fale sobre o que será realizado, como o dinheiro será utilizado, quem está por trás do projeto, como e quando o projeto será entregue. Seja informal e direto, essa é uma conversa entre pessoas que querem compartilhar uma ideia, não um projeto de edital. Lembre-se que <a class="alt-link" target="_blank" href="http://suporte.catarse.me/hc/pt-br/articles/203083017-Adicionar-imagens-e-v%C3%ADdeos-na-descri%C3%A7%C3%A3o-do-projeto">você pode utilizar imagens e vídeos</a> para ilustrar melhor o seu projeto na descrição.'
+      card: 'Card do projeto'
+      card_subtitle: 'Sabe aquele cardzinho de projeto que aparece na home e na busca? Pois então, faz bonito pois dizem que a primeira impressão é a que fica ;)'
+      image: 'Imagem do projeto'
+      image_hint: 'Essa imagem será utilizada como a miniatura de seu projeto (PNG, JPG tamanho 512x400)'
+      headline: 'Frase de efeito'
+      headline_hint: 'Será utilizada no card do projeto, junto com a imagem acima (miniatura). No máximo 100 caracteres.'
+      submit: 'Salvar e visualizar'
+    project_basics:
+      project_start: 'Comece a construir o seu projeto'
+      project_start_subtitle: 'Após percorrer todas as etapas acima, você pode enviar seu projeto para análise'
+      online_date: 'Data de entrada no ar'
+      user_id: 'Id do usuário'
+      name: 'Nome do projeto'
+      name_label: 'Quanto mais direto melhor. Não ultrapasse 50 caracteres'
+      url: 'URL do projeto'
+      url_label: 'É o endereço do seu projeto, deve ser fácil de memorizar. Evite underline, hífen e símbolos'
+      category: 'Categoria'
+      category_label: 'Explore e se inspire em outros projetos da mesma categoria que o seu.'
+      online_days: 'Prazo para arrecadação'
+      online_days_label: 'Em média os projetos ficam no ar por 40 dias. O prazo máximo da campanha é de 60 dias.'
+      value: 'Valor a ser arrecadado'
+      value_secondary: 'Grande parte dos apoios serão de pessoas próximas a você. Pense como conseguir pelo menos 50% do valor da meta dentro da sua rede de contatos. Não se esqueça de incluir a taxa de 13% cobrada pelo Catarse caso seu projeto seja bem-sucedido'
+      form:
+        submit: 'Salvar'
     metrics:
       titles:
         confirmed_by_day: 'Total de apoios confirmados por dia'
         confirmed_amount_by_day: 'Total arrecadado por dia'
         address_state: 'Total de apoios confirmados por Estado'
     reminder:
-      ok: 'Ok! Vamos te mandar um lembrete por e-mail 48 horas antes do fim da campanha, a não ser que você já tenha apoiado o projeto'
+      ok: 'Ok! Vamos te mandar um lembrete por e-mail 48 horas antes do fim da campanha'
+      active_btn: 'Lembre-me deste projeto'
+      deactive_btn: 'Não quero mais ser lembrado'
     send_to_analysis: Seu projeto foi enviado para nossa equipe.
     twitter:
       take_a_look: Confira o projeto %{name} no @catarse

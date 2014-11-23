@@ -1,14 +1,15 @@
 Skull.Form = {
   checkInput: function(event){
-    if(event.currentTarget.checkValidity()){
-      var $target = this.$(event.currentTarget);
+    var $target = this.$(event.currentTarget);
+    var customValidation = $target.data('custom-validation') || function(){ return true; };
+    if(event.currentTarget.checkValidity() && customValidation($target)){
       $target.removeClass("error");
       this.$('[data-error-for=' + $target.prop('id') + ']').hide();
     }
   },
 
   setupForm: function(){
-    this.$('input').on('invalid', this.invalid);
+    this.$('input,select,textarea').on('invalid', this.invalid);
   },
 
   invalid: function(event){
@@ -19,10 +20,12 @@ Skull.Form = {
 
   validate: function(){
     var valid = true;
-    this.$('input:visible').each(function(){
-      valid = this.checkValidity() && valid;
+    this.$('input:visible,select:visible,textarea:visible').each(function(){
+      var $input = $(this);
+      var customValidation = $input.data('custom-validation') || function(){ return true; };
+      valid = this.checkValidity() && customValidation($input) && valid;
     });
-    this.$('input.error:visible:first').select();
+    this.$('[required].error:visible:first').select();
     return valid;
   }
 };

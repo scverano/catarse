@@ -5,11 +5,27 @@ h1, h2, h3, h4, h5, h6, label
 body
   word-wrap: break-word
 
+.list-answer
+  display: none
+
+.required
+  .field-label
+    padding-top: 1px
+    padding-bottom: 1px
+    font-weight: 600
+
 .project-reward-box-hover
   cursor: pointer
 
 .nav-tab
   cursor: pointer
+
+select.date
+  float: left
+  width: 100px
+  margin-right: 5px
+.deliver-at-date
+  width: 230px
 
 .loader
   img
@@ -30,6 +46,9 @@ body
   display: inline
 
 // New contribution page
+.text-field.back-reward-input-reward // fix text-field height conflict
+  height: 70px
+
 .back-reward-radio-reward
   .badge-success
     display: none
@@ -61,6 +80,7 @@ body
       padding-right: 20px
     &.w-sub-col-middle
       padding-right: 20px
+
 
 @media (max-width: 767px)
   .w-col 

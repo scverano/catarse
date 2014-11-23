@@ -1,57 +1,43 @@
-require 'sidekiq/web'
-
 Catarse::Application.routes.draw do
-  def ssl_options
-    if Rails.env.production? && CatarseSettings.get_without_cache(:secure_host)
-      {protocol: 'https', host: CatarseSettings.get_without_cache(:secure_host)}
-    else
-      {}
-    end
-  end
-
   mount JasmineRails::Engine => '/specs' if defined?(JasmineRails)
   devise_for(
     :users,
     {
       path: '',
       path_names:   { sign_in: :login, sign_out: :logout, sign_up: :sign_up },
-      controllers:  { omniauth_callbacks: :omniauth_callbacks, passwords: :passwords },
-      defaults: ssl_options
+      controllers:  { omniauth_callbacks: :omniauth_callbacks, passwords: :passwords }
     }
   )
 
-
   devise_scope :user do
-    post '/sign_up', {to: 'devise/registrations#create', as: :sign_up}.merge(ssl_options)
+    post '/sign_up', {to: 'devise/registrations#create', as: :sign_up}
   end
-
 
   get '/thank_you' => "static#thank_you"
 
-
-  check_user_admin = lambda { |request| request.env["warden"].authenticate? and request.env['warden'].user.admin }
-
   filter :locale, exclude: /\/auth\//
-
-  # Mountable engines
-  constraints check_user_admin do
-    mount Sidekiq::Web => '/sidekiq'
-  end
 
   mount CatarsePaypalExpress::Engine => "/", as: :catarse_paypal_express
   mount CatarseMoip::Engine => "/", as: :catarse_moip
-  mount CatarseCredits::Engine => "/", as: :catarse_credits
-  #  mount CatarseWepay::Engine => "/", as: :catarse_wepay
+  mount CatarsePagarme::Engine => "/", as: :catarse_pagarme
+#  mount CatarseWepay::Engine => "/", as: :catarse_wepay
 
   get '/post_preview' => 'post_preview#show', as: :post_preview
-  resources :projects, only: [:index, :create, :update, :new, :show] do
+  resources :categories, only: [] do
+    member do
+      get :subscribe, to: 'categories/subscriptions#create'
+      get :unsubscribe, to: 'categories/subscriptions#destroy'
+    end
+  end
+  resources :auto_complete_projects, only: [:index]
+  resources :projects, only: [:index, :create, :update, :edit, :new, :show] do
     resources :posts, controller: 'projects/posts', only: [ :index, :create, :destroy ]
     resources :rewards, only: [ :index, :create, :update, :destroy, :new, :edit ] do
       member do
         post 'sort'
       end
     end
-    resources :contributions, {controller: 'projects/contributions'}.merge(ssl_options) do
+    resources :contributions, {controller: 'projects/contributions'} do
       member do
         put 'credits_checkout'
       end
@@ -73,6 +59,7 @@ Catarse::Application.routes.draw do
   end
   resources :users do
     resources :projects, controller: 'users/projects', only: [ :index ]
+    resources :credit_cards, controller: 'users/credit_cards', only: [ :destroy ]
     member do
       get :unsubscribe_notifications
       get :credits
@@ -89,7 +76,7 @@ Catarse::Application.routes.draw do
       get 'projects'
       put 'unsubscribe_update'
       put 'update_email'
-      put 'update_password', ssl_options
+      put 'update_password'
     end
   end
 
@@ -147,12 +134,14 @@ Catarse::Application.routes.draw do
 
     resources :contributions, only: [ :index, :update, :show ] do
       member do
+        get :second_slip
         put 'confirm'
         put 'pendent'
         put 'change_reward'
         put 'refund'
         put 'hide'
         put 'cancel'
+        put 'request_refund'
         put 'push_to_trash'
       end
     end

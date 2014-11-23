@@ -16,7 +16,7 @@ class ProjectsController < ApplicationController
             .most_recent_first
             .includes(:project_total, :user, :category)
             .page(params[:page]).per(6)
-          return render partial: 'project', collection: @projects, layout: false
+          return render partial: 'project', collection: @projects, layout: false, locals: {ref: "explore"}
         else
           @title = t("site.title")
 
@@ -39,7 +39,7 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new params[:project].merge(user: current_user)
     authorize @project
-    create! { project_by_slug_path(@project.permalink) }
+    create! { edit_project_path(@project, anchor: 'basics') }
   end
 
   def destroy
@@ -67,9 +67,14 @@ class ProjectsController < ApplicationController
           flash[:notice] = t('project.update.success')
         end
 
-        redirect_to project_by_slug_path(@project.reload.permalink, anchor: 'edit')
+        redirect_to edit_project_path(@project)
       end
     end
+  end
+
+  def edit
+    authorize resource
+    @posts_count = resource.posts.count(:all)
   end
 
   def show
@@ -114,6 +119,6 @@ class ProjectsController < ApplicationController
   end
 
   def use_catarse_boostrap
-    ["new", "create", "show", "about_mobile"].include?(action_name) ? 'catarse_bootstrap' : 'application'
+    ["edit", "new", "create", "show", "about_mobile"].include?(action_name) ? 'catarse_bootstrap' : 'application'
   end
 end

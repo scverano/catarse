@@ -102,3 +102,35 @@ task :migrate_project_thumbnails => :environment do
   end
 
 end
+
+desc "Deliver a collection of recents projects of a category"
+task deliver_projects_of_week: :environment do
+  if Time.now.in_time_zone(Time.zone.tzinfo.name).monday?
+    Category.with_projects_on_this_week.each do |category|
+      category.deliver_projects_of_week_notification
+    end
+  end
+end
+
+desc "Deliver credits waning for users that have credits less than R$ 10"
+task :deliver_credits_less_10, [:percent] => :environment do |t, args|
+  total_percent = (args.percent.to_f/100.0)
+  collection = User.already_used_credits.where("user_totals.credits < 10")
+  limit = (args.percent.present? ? (collection.count * total_percent).to_i : nil)
+
+  collection.limit(limit).each do |user|
+    user.notify(:credits_warning_less_group)
+  end
+end
+
+desc "Deliver credits waning for users that have credits more than R$ 10"
+task :deliver_credits_more_than_10, [:percent] => :environment do |t, args|
+  total_percent = (args.percent.to_f/100.0)
+  collection = User.already_used_credits.where("user_totals.credits >= 10")
+
+  limit = (args.percent.present? ? (collection.count * total_percent).to_i : nil)
+
+  collection.limit(limit).each do |user|
+    user.notify(:credits_warning_more_group)
+  end
+end

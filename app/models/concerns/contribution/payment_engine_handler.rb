@@ -17,9 +17,18 @@ module Contribution::PaymentEngineHandler
       payment_engine.direct_refund(self)
     end
 
+    def second_slip_path
+      payment_engine.try(:second_slip_path, self)
+    end
+
+    def can_generate_second_slip?
+      payment_engine.try(:can_generate_second_slip?)
+    end
+
     def update_current_billing_info
       self.address_street = user.address_street
       self.address_number = user.address_number
+      self.address_complement = user.address_complement
       self.address_neighbourhood = user.address_neighbourhood
       self.address_zip_code = user.address_zip_code
       self.address_city = user.address_city
@@ -34,6 +43,7 @@ module Contribution::PaymentEngineHandler
       user.update_attributes({
         address_street: address_street.presence || user.address_street,
         address_number: address_number.presence || user.address_number,
+        address_complement: address_complement.presence || user.address_complement,
         address_neighbourhood: address_neighbourhood.presence || user.address_neighbourhood,
         address_zip_code: address_zip_code.presence|| user.address_zip_code,
         address_city: address_city.presence || user.address_city,

@@ -26,41 +26,41 @@
 
 = render 'mobile_video'
 
-nav.project-nav.w-hidden-small.w-hidden-tiny
-  .w-container
-    .w-row
-      .w-col.w-col-9.w-hidden-small.w-hidden-tiny
-        = link_to '#about', id: 'about_link', class: 'nav-tab selected', data: {target: '#project_about.content'} do
-          = t('.menu.about')
-        = link_to '#posts', id: 'posts_link', class: 'nav-tab' , data: {target: '#project_posts'} do
-          => t('.menu.posts')
-          span.badge = @posts_count
-        = link_to '#contributions', id: 'contributions_link', class: 'nav-tab' , data: {target: '#project_contributions'} do
-          => t('.menu.contributions')
-          span.badge = @project.total_contributions
+- if !@project.draft?
+  nav.project-nav.w-hidden-small.w-hidden-tiny
+    .w-container
+      .w-row
+        .w-col.w-col-9.w-hidden-small.w-hidden-tiny
+          = link_to '#about', id: 'about_link', class: 'nav-tab selected', data: {target: '#project_about.content'} do
+            = t('.menu.about')
+          = link_to '#posts', id: 'posts_link', class: 'nav-tab' , data: {target: '#project_posts'} do
+            => t('.menu.posts')
+            span.badge = @posts_count
+          = link_to '#contributions', id: 'contributions_link', class: 'nav-tab' , data: {target: '#project_contributions'} do
+            => t('.menu.contributions')
+            span.badge = @project.total_contributions
 
-        = link_to '#comments', id: 'comments_link', class: 'nav-tab' , data: {target: '#project_comments'} do
-          => t('.menu.comments')
-          fb:comments-count href="#{request.base_url}/#{request.fullpath.split('/')[2]}" class="badge" style="display: inline"
-            |&nbsp;
+          = link_to '#comments', id: 'comments_link', class: 'nav-tab' , data: {target: '#project_comments'} do
+            => t('.menu.comments')
+            fb:comments-count href="#{request.base_url}/#{request.fullpath.split('/')[2]}" class="badge" style="display: inline"
+              |&nbsp;
 
-      .w-col.w-col-3.w-hidden-small.w-hidden-tiny.w-clearfix.project-nav-category
-        = link_to @project.category, explore_path(anchor: "by_category_id/#{@project.category_id}"), class: 'link-hidden-light u-right'
-        = image_tag 'catarse_bootstrap/tag-icon.png', class: 'project-nav-category-icon', width: "22" 
-
+        .w-col.w-col-3.w-hidden-small.w-hidden-tiny.w-clearfix.project-nav-category
+          = link_to @project.category, explore_path(anchor: "by_category_id/#{@project.category_id}"), class: 'link-hidden-light u-right'
+          = image_tag 'catarse_bootstrap/tag-icon.png', class: 'project-nav-category-icon', width: "22" 
 
 section.section
   .w-container
     .w-row
-      article.w-col.w-col-8.w-hidden-small.w-hidden-tiny
-        #project_about.content = render 'project_about'
+      article.w-hidden-small.w-hidden-tiny
+        #project_about.content.w-col.w-col-8 = render 'project_about'
 
-        #project_posts.content.w-hidden[data-path=project_posts_path(project_id: @project.id)]
+        #project_posts.content.w-col.w-col-8.w-hidden[data-path=project_posts_path(project_id: @project.id)]
           .posts
             | &nbsp;
           #posts-loading.loader.u-text-center.w-col.w-col-12 = image_tag "catarse_bootstrap/loader.gif"
 
-        #project_contributions.content.w-hidden[data-path=project_contributions_path(project_id: @project.id)]
+        #project_contributions.content.w-col.w-col-8.w-hidden[data-path=project_contributions_path(project_id: @project.id)]
           - if policy(@project).update?
             .w-row
               .w-col.w-col-1
@@ -76,9 +76,7 @@ section.section
             | &nbsp;
           #contributions-loading.loader.u-text-center.w-col.w-col-12 = image_tag "catarse_bootstrap/loader.gif"
 
-        #project_comments.content.w-hidden
-
-
+        #project_comments.content.w-col.w-col-8.w-hidden
 
       #project-sidebar.aside.w-col.w-col-4
         .project-stats
@@ -112,25 +110,23 @@ section.section
           .fontsize-smallest = t('contributed_project', count: @project.user.total_contributed_projects)
           .project-author-contacts
             ul.w-list-unstyled.fontsize-smaller.fontweight-semibold
-              - if @project.user.facebook_link
+              - if @project.user.facebook_link.present?
                 li
                   = link_to t('.facebook_profile'), @project.user.facebook_link, target: '_blank', class: 'link-hidden'
-              - if @project.user.twitter
+              - if @project.user.twitter_link
                 li
                   = link_to t('.twitter_profile'), @project.user.twitter_link, target: '_blank', class: 'link-hidden'
-              - if @project.user.other_link
+              - if @project.user.other_link.present?
                 li
                   = link_to t('.author_website'), @project.user.other_link, target: '_blank', class: 'link-hidden'
           = mail_to @project.user.email, t('.contact_author'), target: '_blank', class: 'btn btn-medium btn-message'
 
         .w-hidden-main.w-hidden-medium.project-share
           .div-share-mobile-fb
-            = link_to '#', class: 'btn btn-medium btn-fb' do
-              = image_tag 'catarse_bootstrap/facebook-xxl.png', class: 'icon-share-mobile'
-              = t('.share')
+            = render_facebook_share_mobile(url: project_by_slug_url(permalink: @project.permalink), title: @project.name)
           .div-share-mobile-fb
-            = link_to '#', class: 'btn btn-medium btn-fb btn-tweet' do
-              = image_tag 'catarse_bootstrap/twitter-256.png', class: 'icon-share-mobile'
+            .btn.btn-medium.btn-fb.btn-tweet
+              = render_twitter_mobile(url: project_by_slug_url(permalink: @project.permalink), title: @project.name)
               = t('.tweet')
 
         #rewards.u-marginbottom-30[data-can_update="#{policy(@project).update?}" data-index_path=project_rewards_path(@project)]

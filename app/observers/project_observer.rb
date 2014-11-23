@@ -51,7 +51,6 @@ class ProjectObserver < ActiveRecord::Observer
 
   def from_in_analysis_to_rejected(project)
     project.update_attributes({ rejected_at: DateTime.now })
-    deliver_default_notification_for(project, :project_rejected)
   end
 
   def from_in_analysis_to_draft(project)
@@ -89,17 +88,13 @@ class ProjectObserver < ActiveRecord::Observer
   def notify_users(project)
     project.contributions.with_state('confirmed').each do |contribution|
       unless contribution.notified_finish
-        template_name = if project.successful?
-                          :contribution_project_successful
-                        elsif (contribution.credits? || contribution.slip_payment?)
-                          :contribution_project_unsuccessful
-                        elsif contribution.is_paypal? || contribution.is_credit_card?
-                          :contribution_project_unsuccessful_credit_card
-                        else
-                          :automatic_refund
-                        end
-
+        template_name = project.successful? ? :contribution_project_successful : contribution.notification_template_for_failed_project
         contribution.notify_to_contributor(template_name)
+
+        if contribution.credits? && project.failed?
+          contribution.notify_to_backoffice(:requested_refund_for_credits)
+        end
+
         contribution.update_attributes({ notified_finish: true })
       end
     end
@@ -108,7 +103,7 @@ class ProjectObserver < ActiveRecord::Observer
   private
 
   def request_refund_for_failed_project(project)
-    project.contributions.where("state = 'confirmed' AND (payment_method = 'PayPal' OR payment_choice = 'CartaoDeCredito')").each do |contribution|
+    project.contributions.with_state('confirmed').each do |contribution|
       contribution.request_refund
     end
   end

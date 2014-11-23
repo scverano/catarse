@@ -1,7 +1,6 @@
 # coding: utf-8
 class UsersController < ApplicationController
   after_filter :verify_authorized, except: %i[reactivate]
-  skip_before_filter :force_http, only: [:update_password]
   inherit_resources
   defaults finder: :find_active!
   actions :show, :update, :update_password, :unsubscribe_notifications, :credits, :destroy
@@ -33,6 +32,8 @@ class UsersController < ApplicationController
       @credits = @user.contributions.can_refund
       @subscribed_to_posts = @user.posts_subscription
       @unsubscribes = @user.project_unsubscribes
+      @credit_cards = @user.credit_cards
+      build_bank_account
     }
   end
 
@@ -69,5 +70,14 @@ class UsersController < ApplicationController
       flash[:error] = @user.errors.full_messages.to_sentence
     end
     return redirect_to user_path(@user, anchor: 'settings')
+  end
+
+  private
+  def build_bank_account
+    @user.build_bank_account unless @user.bank_account
+  end
+
+  def permitted_params
+    params.permit(policy(resource).permitted_attributes)
   end
 end

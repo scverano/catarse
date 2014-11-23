@@ -30,14 +30,15 @@ App.addChild('Project', _.extend({
   },
 
   followRoute: function(name){
-    var $tab = this.$('nav.project-nav a[href="' + window.location.hash + '"]');
+    var $tab = this.$('nav a[href="' + window.location.hash + '"]');
     if($tab.length > 0){
       this.onTabClick({ currentTarget: $tab });
+      var tabs = ['metrics_link'];
 
-      if($tab.prop('id') == 'metrics_link') {
-        $('.sidebar').hide();
+      if($.inArray($tab.prop('id'), tabs) !== -1) {
+        $('#project-sidebar').hide();
       } else {
-        $('.sidebar').show();
+        $('#project-sidebar').show();
       }
     }
   },

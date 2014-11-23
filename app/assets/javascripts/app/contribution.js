@@ -3,7 +3,13 @@ App.addChild('Contribution', {
 
   events: {
     'click label.back-reward-radio-reward' : 'clickReward',
-    'click #submit' : 'submitForm'
+    'click #submit' : 'submitForm',
+    'input #contribution_value' : 'restrictChars'
+  },
+
+  restrictChars: function(event){
+    var $target = $(event.target);
+    $target.val($target.val().replace(/[^\d,]/, ''));
   },
 
   submitForm: function(){
@@ -12,9 +18,9 @@ App.addChild('Contribution', {
   },
 
   activate: function(){
-    this.$('input[type=radio]:checked').parent().addClass('selected');
     this.$value = this.$('#contribution_value');
     this.$minimum = this.$('#minimum-value')
+    this.clickReward({currentTarget: this.$('input[type=radio]:checked').parent()[0]});
   },
 
   resetReward: function(event){
